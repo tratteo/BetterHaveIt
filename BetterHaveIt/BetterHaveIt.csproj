@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>$(VersionPrefix)1.0.1</Version>
+    <Authors>tratteo</Authors>
+    <Description>A .NET C# package that is better if you have it installed</Description>
+    <RepositoryUrl>https://github.com/tratteo/BetterHaveIt</RepositoryUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>$(AssemblyName)</PackageId>
+  </PropertyGroup>
+
+</Project>

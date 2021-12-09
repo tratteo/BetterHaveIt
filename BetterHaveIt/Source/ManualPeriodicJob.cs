@@ -1,6 +1,6 @@
 ﻿// Copyright Matteo Beltrame
 
-namespace NiceToHave;
+namespace BetterHaveIt;
 
 public class ManualPeriodicJob : PeriodicJob
 {

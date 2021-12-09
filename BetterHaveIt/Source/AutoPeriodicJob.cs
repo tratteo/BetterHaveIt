@@ -1,10 +1,6 @@
 ﻿// Copyright Matteo Beltrame
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace NiceToHave;
+namespace BetterHaveIt;
 
 public class AutoPeriodicJob : PeriodicJob
 {

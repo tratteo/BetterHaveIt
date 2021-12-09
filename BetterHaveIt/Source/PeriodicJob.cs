@@ -1,9 +1,6 @@
 ﻿// Copyright Matteo Beltrame
 
-using System;
-using System.Threading.Tasks;
-
-namespace NiceToHave;
+namespace BetterHaveIt;
 
 public abstract class PeriodicJob
 {

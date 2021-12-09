@@ -1,9 +1,8 @@
 ﻿// Copyright Matteo Beltrame
 
 using System.Collections;
-using System.Collections.Generic;
 
-namespace NiceToHave;
+namespace BetterHaveIt;
 
 public class DistinctList<T> : IList<T>
 {

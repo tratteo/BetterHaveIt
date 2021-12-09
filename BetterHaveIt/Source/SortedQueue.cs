@@ -1,10 +1,6 @@
 ﻿// Copyright Matteo Beltrame
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace NiceToHave;
+namespace BetterHaveIt;
 
 public enum SortingType
 {
