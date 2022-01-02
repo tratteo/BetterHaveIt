@@ -12,7 +12,7 @@ public class RepositoryJson<T> : IRepository<T> where T : class, new()
 
     public RepositoryJson(string compositePath, bool enableHotReload = true)
     {
-        if (path == null || path == string.Empty)
+        if (compositePath == null || compositePath == string.Empty)
         {
             throw new Exception($"Unable to deserialize {GetType().FullName}, path is empty");
         }
