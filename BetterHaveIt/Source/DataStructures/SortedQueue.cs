@@ -1,6 +1,6 @@
 ﻿// Copyright Matteo Beltrame
 
-namespace BetterHaveIt;
+namespace BetterHaveIt.DataStructures;
 
 public enum SortingType
 {

@@ -1,6 +1,6 @@
 ﻿// Copyright Matteo Beltrame
 
-namespace BetterHaveIt;
+namespace BetterHaveIt.PeriodicJobs;
 
 public class ManualPeriodicJob : PeriodicJob
 {

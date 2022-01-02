@@ -2,7 +2,7 @@
 
 using System.Text;
 
-namespace BetterHaveIt;
+namespace BetterHaveIt.DataStructures;
 
 internal class ByteBuffer
 {

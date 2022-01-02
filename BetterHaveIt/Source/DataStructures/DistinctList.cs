@@ -2,7 +2,7 @@
 
 using System.Collections;
 
-namespace BetterHaveIt;
+namespace BetterHaveIt.DataStructures;
 
 public class DistinctList<T> : IList<T>
 {
@@ -32,6 +32,10 @@ public class DistinctList<T> : IList<T>
         if (list.Contains(item)) return;
         list.Add(item);
     }
+
+    public T? Find(Predicate<T> match) => list.Find(match);
+
+    public List<T> FindAll(Predicate<T> match) => list.FindAll(match);
 
     public void Clear() => list.Clear();
 
