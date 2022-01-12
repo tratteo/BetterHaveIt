@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 
 namespace BetterHaveIt.Repositories;
 
@@ -10,7 +10,7 @@ public class RepositoryJson<T> : IRepository<T> where T : class, new()
 
     public T Data { get; private set; }
 
-    public RepositoryJson(string compositePath, bool enableHotReload = true)
+    public RepositoryJson(string compositePath, bool create = true, bool reloadOnChange = true)
     {
         if (compositePath == null || compositePath == string.Empty)
         {
@@ -19,18 +19,27 @@ public class RepositoryJson<T> : IRepository<T> where T : class, new()
 
         Data = new T();
         (path, name) = PathExtensions.Split(compositePath!);
-        if (enableHotReload) SetupHotReload();
-        if (!Serializer.DeserializeJson($"{path}/", name, out T? parsed))
+        if (path == string.Empty) path = "./";
+        if (!Serializer.DeserializeJson(path, name, out T? parsed))
         {
-            throw new Exception($"Unable to deserialize {GetType().Name} at {AppDomain.CurrentDomain.BaseDirectory}{path}/{name}");
+            parsed = null;
+            if (!create)
+            {
+                throw new Exception($"Unable to deserialize {GetType().Name} at {AppDomain.CurrentDomain.BaseDirectory}{path}/{name}");
+            }
+            else
+            {
+                Serializer.SerializeJson(path, name, Data);
+            }
         }
         if (parsed is not null)
         {
             Data = parsed;
         }
+        if (reloadOnChange) SetupHotReload();
     }
 
-    public event Action<bool> OnHotReloadTry = delegate { };
+    public event Action<bool> OnReloadTry = delegate { };
 
     public void Save()
     {
@@ -74,7 +83,7 @@ public class RepositoryJson<T> : IRepository<T> where T : class, new()
                     {
                         await Task.Delay(attemptDelay);
                     }
-                    else if (ex is JsonReaderException)
+                    else if (ex is JsonException)
                     {
                         success = false;
                         break;
@@ -82,7 +91,7 @@ public class RepositoryJson<T> : IRepository<T> where T : class, new()
                 }
             }
             watcher.EnableRaisingEvents = true;
-            OnHotReloadTry?.Invoke(success);
+            OnReloadTry?.Invoke(success);
         };
     }
 }

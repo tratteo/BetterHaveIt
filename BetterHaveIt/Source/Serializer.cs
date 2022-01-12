@@ -1,6 +1,6 @@
 ﻿// Copyright Siamango
 
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace BetterHaveIt;
 
@@ -11,7 +11,7 @@ public class Serializer
         if (File.Exists(path + name))
         {
             var jsonString = File.ReadAllText(path + name);
-            T? metadata = JsonConvert.DeserializeObject<T>(jsonString);
+            T? metadata = JsonSerializer.Deserialize<T>(jsonString);
             json = metadata;
             return true;
         }
@@ -21,12 +21,7 @@ public class Serializer
 
     public static void SerializeJson<T>(string path, string name, T metadata, bool createPath = true)
     {
-        if (createPath && !path.Equals(string.Empty))
-        {
-            Directory.CreateDirectory(path);
-        }
-        var jsonString = JsonConvert.SerializeObject(metadata, Formatting.Indented);
-        File.WriteAllText(path + name, jsonString);
+        WriteAll(path, name, JsonSerializer.Serialize(metadata, new JsonSerializerOptions() { WriteIndented = true }), createPath);
     }
 
     public static void WriteAll(string path, string name, object obj, bool createPath = true)
