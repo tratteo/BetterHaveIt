@@ -11,7 +11,7 @@ public class Serializer
         if (File.Exists(path + name))
         {
             var jsonString = File.ReadAllText(path + name);
-            T? metadata = JsonSerializer.Deserialize<T>(jsonString);
+            T? metadata = JsonSerializer.Deserialize<T>(jsonString, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
             json = metadata;
             return true;
         }
