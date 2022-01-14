@@ -6,12 +6,12 @@ namespace BetterHaveIt;
 
 public class Serializer
 {
-    public static bool DeserializeJson<T>(string path, string name, out T? json)
+    public static bool DeserializeJson<T>(string path, string name, out T? json, JsonSerializerSettings? settings = null)
     {
         if (File.Exists(path + name))
         {
             var jsonString = File.ReadAllText(path + name);
-            T? metadata = JsonConvert.DeserializeObject<T>(jsonString);
+            T? metadata = JsonConvert.DeserializeObject<T>(jsonString, settings);
             json = metadata;
             return true;
         }
@@ -19,7 +19,8 @@ public class Serializer
         return false;
     }
 
-    public static void SerializeJson<T>(string path, string name, T metadata, bool createPath = true) => WriteAll(path, name, JsonConvert.SerializeObject(metadata, Formatting.Indented), createPath);
+    public static void SerializeJson<T>(string path, string name, T metadata, bool createPath = true, JsonSerializerSettings? settings = null) =>
+        WriteAll(path, name, JsonConvert.SerializeObject(metadata, Formatting.Indented, settings), createPath);
 
     public static void WriteAll(string path, string name, object obj, bool createPath = true)
     {
