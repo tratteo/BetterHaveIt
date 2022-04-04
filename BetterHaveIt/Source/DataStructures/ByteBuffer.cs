@@ -19,7 +19,7 @@ public class ByteBuffer : IDisposable
 
     public static ByteBuffer From(IReadOnlyCollection<byte> bytes)
     {
-        ByteBuffer buffer = new ByteBuffer();
+        var buffer = new ByteBuffer();
         buffer.data.AddRange(bytes);
         return buffer;
     }
@@ -183,5 +183,9 @@ public class ByteBuffer : IDisposable
 
     #endregion Read
 
-    public void Dispose() => data.Clear();
+    public void Dispose()
+    {
+        data.Clear();
+        GC.SuppressFinalize(this);
+    }
 }

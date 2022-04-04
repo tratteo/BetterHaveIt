@@ -5,31 +5,28 @@ namespace BetterHaveIt.Repositories;
 public class RepositoryJson<T> : IRepository<T> where T : class, new()
 {
     private readonly string path;
-    private readonly string name;
     private FileSystemWatcher? watcher;
 
     public T Data { get; private set; }
 
-    public RepositoryJson(string compositePath, bool create = true, bool reloadOnChange = true)
+    public RepositoryJson(string path, bool create = true, bool reloadOnChange = true)
     {
-        if (compositePath == null || compositePath == string.Empty)
+        if (path == null || path == string.Empty)
         {
             throw new Exception($"Unable to deserialize {GetType().FullName}, path is empty");
         }
-
+        this.path = path;
         Data = new T();
-        (path, name) = PathExtensions.Split(compositePath!);
-        if (path == string.Empty) path = "./";
-        if (!Serializer.DeserializeJson(path, name, out T? parsed))
+        if (!Serializer.DeserializeJson(path, out T? parsed))
         {
             parsed = null;
             if (!create)
             {
-                throw new Exception($"Unable to deserialize {GetType().Name} at {AppDomain.CurrentDomain.BaseDirectory}{path}/{name}");
+                throw new Exception($"Unable to deserialize {GetType().Name} at {AppDomain.CurrentDomain.BaseDirectory}{this.path}");
             }
             else
             {
-                Serializer.SerializeJson(path, name, Data);
+                Serializer.SerializeJson(path, Data);
             }
         }
         if (parsed is not null)
@@ -44,54 +41,59 @@ public class RepositoryJson<T> : IRepository<T> where T : class, new()
     public void Save()
     {
         if (watcher is not null) watcher.EnableRaisingEvents = false;
-        Serializer.SerializeJson($"{path}/", name, Data);
+        Serializer.SerializeJson(path, Data);
         if (watcher is not null) watcher.EnableRaisingEvents = true;
     }
 
     private void SetupHotReload()
     {
-        watcher = new FileSystemWatcher($"{path}")
+        var dir = Path.GetDirectoryName(path);
+        var name = Path.GetFileName(path);
+        watcher = new FileSystemWatcher(dir is null ? string.Empty : dir)
         {
             NotifyFilter = NotifyFilters.LastWrite,
             Filter = name,
             IncludeSubdirectories = false,
             EnableRaisingEvents = true
         };
-        watcher.Changed += async (sender, e) =>
+        watcher.Changed += OnFileChanged;
+    }
+
+    private async void OnFileChanged(object sender, FileSystemEventArgs args)
+    {
+        if (watcher is null) return;
+        watcher.EnableRaisingEvents = false;
+        var tries = 10;
+        var attemptDelay = 50;
+        var success = false;
+        for (var i = 0; i <= tries; ++i)
         {
-            watcher.EnableRaisingEvents = false;
-            var tries = 10;
-            var attemptDelay = 50;
-            var success = false;
-            for (var i = 0; i <= tries; ++i)
+            try
             {
-                try
+                if (Serializer.DeserializeJson(path, out T? parsed))
                 {
-                    if (Serializer.DeserializeJson($"{path}/", name, out T? parsed))
+                    if (parsed is not null)
                     {
-                        if (parsed is not null)
-                        {
-                            success = true;
-                            Data = parsed;
-                            break;
-                        }
-                    }
-                }
-                catch (Exception ex) when (i <= tries)
-                {
-                    if (ex is IOException)
-                    {
-                        await Task.Delay(attemptDelay);
-                    }
-                    else if (ex is JsonException)
-                    {
-                        success = false;
+                        success = true;
+                        Data = parsed;
                         break;
                     }
                 }
             }
-            watcher.EnableRaisingEvents = true;
-            OnReloadTry?.Invoke(success);
-        };
+            catch (Exception ex) when (i <= tries)
+            {
+                if (ex is IOException)
+                {
+                    await Task.Delay(attemptDelay);
+                }
+                else if (ex is JsonException)
+                {
+                    success = false;
+                    break;
+                }
+            }
+        }
+        watcher.EnableRaisingEvents = true;
+        OnReloadTry?.Invoke(success);
     }
 }

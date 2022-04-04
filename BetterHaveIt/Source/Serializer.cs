@@ -6,12 +6,12 @@ namespace BetterHaveIt;
 
 public class Serializer
 {
-    public static bool DeserializeJson<T>(string path, string name, out T? json, JsonSerializerSettings? settings = null)
+    public static bool DeserializeJson<T>(string path, out T? json, JsonSerializerSettings? settings = null)
     {
-        if (File.Exists(path + name))
+        if (File.Exists(path))
         {
-            var jsonString = File.ReadAllText(path + name);
-            T? metadata = JsonConvert.DeserializeObject<T>(jsonString, settings);
+            var jsonString = File.ReadAllText(path);
+            var metadata = JsonConvert.DeserializeObject<T>(jsonString, settings);
             json = metadata;
             return true;
         }
@@ -19,17 +19,18 @@ public class Serializer
         return false;
     }
 
-    public static void SerializeJson<T>(string path, string name, T metadata, bool createPath = true, JsonSerializerSettings? settings = null) =>
-        WriteAll(path, name, JsonConvert.SerializeObject(metadata, Formatting.Indented, settings), createPath);
+    public static void SerializeJson<T>(string path, T metadata, bool createPath = true, JsonSerializerSettings? settings = null) =>
+        WriteAll(path, JsonConvert.SerializeObject(metadata, Formatting.Indented, settings), createPath);
 
-    public static void WriteAll(string path, string name, object obj, bool createPath = true)
+    public static void WriteAll(string path, object obj, bool createPath = true)
     {
-        if (createPath && !path.Equals(string.Empty))
+        var dir = Path.GetDirectoryName(path);
+        if (createPath && dir is not null && !dir.Equals(string.Empty))
         {
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(dir);
         }
-        File.WriteAllText(path + name, obj.ToString());
+        File.WriteAllText(path, obj.ToString());
     }
 
-    public static string ReadAll(string path, string name) => File.Exists(path + name) ? File.ReadAllText(path + name) : string.Empty;
+    public static string ReadAll(string path) => File.Exists(path) ? File.ReadAllText(path) : string.Empty;
 }
