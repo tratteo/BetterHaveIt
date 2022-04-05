@@ -20,7 +20,7 @@ public class Serializer
     }
 
     public static void SerializeJson<T>(string path, T metadata, bool createPath = true, JsonSerializerSettings? settings = null) =>
-        WriteAll(path, JsonConvert.SerializeObject(metadata, Formatting.Indented, settings), createPath);
+        WriteAll(path, JsonConvert.SerializeObject(metadata, settings), createPath);
 
     public static void WriteAll(string path, object obj, bool createPath = true)
     {
